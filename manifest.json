@@ -1,0 +1,19 @@
+{
+  "name": "Involute Gear Generator",
+  "short_name": "GearGen",
+  "description": "Generate parametric involute spur gears with real-time 2D preview and export to DXF, SVG & PNG for CAD and CNC workflows",
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0a0e14",
+  "theme_color": "#0a0e14",
+  "categories": ["utilities", "productivity"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
