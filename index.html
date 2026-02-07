@@ -11,24 +11,14 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        fontFamily: {
-          sans: ['Inter', 'sans-serif'],
-          mono: ['JetBrains Mono', 'monospace']
-        }
-      }
-    }
-  }
+  tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'], mono: ['JetBrains Mono','monospace'] } } } }
   </script>
   <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; overflow: hidden; }
-  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar { width: 8px; }
   ::-webkit-scrollbar-track { background: #18181b; }
   ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
-  ::-webkit-scrollbar-thumb:hover { background: #52525b; }
   input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; background: #27272a; border-radius: 3px; outline: none; }
   input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: #f59e0b; border-radius: 50%; cursor: pointer; box-shadow: 0 0 0 3px rgba(245,158,11,0.15); }
   .toggle { position: relative; width: 32px; height: 20px; background: #3f3f46; border-radius: 9999px; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
@@ -42,14 +32,16 @@
   #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); transition: transform 0.3s ease; }
   #toast.show { transform: translateX(-50%) translateY(0); }
   #viewport:active { cursor: grabbing; }
-  @media (max-width: 800px) {
-    #sidebar { width: 300px !important; min-width: 300px !important; }
-  }
+  .mode-btn { transition: all 0.15s; }
+  .mode-btn.active { background: #f59e0b; color: #18181b; }
+  @media (max-width: 800px) { #sidebar { width: 300px !important; min-width: 300px !important; } }
   </style>
 </head>
 <body class="font-sans bg-zinc-950 text-zinc-100">
 <div id="app" class="flex h-screen">
   <aside id="sidebar" class="w-[360px] min-w-[360px] bg-zinc-900 border-r border-zinc-700 flex flex-col overflow-y-auto overflow-x-hidden">
+
+    <!-- Logo -->
     <div class="px-5 pt-4 pb-4 border-b border-zinc-700">
       <div class="flex gap-1.5 mb-3">
         <div class="w-3 h-3 rounded-full bg-red-500"></div>
@@ -69,14 +61,24 @@
         </div>
       </div>
     </div>
+
+    <!-- Mode Switch -->
+    <div class="px-5 pt-4 pb-3 border-b border-zinc-700">
+      <div class="flex bg-zinc-800 rounded-lg p-1 gap-1">
+        <button id="mode-single" class="mode-btn active flex-1 py-1.5 text-xs font-mono font-bold rounded-md text-center cursor-pointer">Single Gear</button>
+        <button id="mode-pair" class="mode-btn flex-1 py-1.5 text-xs font-mono font-bold rounded-md text-center cursor-pointer text-zinc-400 hover:text-zinc-200">Gear Pair</button>
+      </div>
+    </div>
+
+    <!-- Gear 1 Parameters -->
     <div class="p-5 border-b border-zinc-700">
       <div class="flex items-center justify-between mb-3.5">
-        <span class="text-xs font-bold uppercase tracking-widest text-zinc-500 font-mono">Gear Parameters</span>
+        <span class="text-xs font-bold uppercase tracking-widest text-zinc-500 font-mono" id="g1-title">Gear Parameters</span>
         <span class="text-xs px-2 py-0.5 bg-amber-500/10 text-amber-400 rounded font-mono">Spur</span>
       </div>
       <div class="mb-3">
         <div class="flex justify-between items-center mb-1.5">
-          <span class="text-sm font-medium text-zinc-100">Module (mm)</span>
+          <span class="text-sm font-medium">Module (mm)</span>
           <span class="font-mono text-xs font-medium text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded min-w-[52px] text-center" id="v-mod">2.0</span>
         </div>
         <div class="flex items-center gap-2.5">
@@ -86,7 +88,7 @@
       </div>
       <div class="mb-3">
         <div class="flex justify-between items-center mb-1.5">
-          <span class="text-sm font-medium text-zinc-100">Number of Teeth</span>
+          <span class="text-sm font-medium">Number of Teeth</span>
           <span class="font-mono text-xs font-medium text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded min-w-[52px] text-center" id="v-teeth">24</span>
         </div>
         <div class="flex items-center gap-2.5">
@@ -96,9 +98,9 @@
       </div>
       <div class="mb-3">
         <div class="flex justify-between items-center mb-1.5">
-          <span class="text-sm font-medium text-zinc-100">Pressure Angle</span>
+          <span class="text-sm font-medium">Pressure Angle</span>
         </div>
-        <select id="s-pa" class="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 text-sm font-mono outline-none cursor-pointer focus:border-amber-500 focus:outline-none">
+        <select id="s-pa" class="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 text-sm font-mono outline-none cursor-pointer focus:border-amber-500">
           <option value="14.5">14.5 (legacy / clocks)</option>
           <option value="20" selected>20 (standard)</option>
           <option value="25">25 (high load)</option>
@@ -106,7 +108,7 @@
       </div>
       <div class="mb-3">
         <div class="flex justify-between items-center mb-1.5">
-          <span class="text-sm font-medium text-zinc-100">Profile Shift (x)</span>
+          <span class="text-sm font-medium">Profile Shift (x)</span>
           <span class="font-mono text-xs font-medium text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded min-w-[52px] text-center" id="v-ps">0.00</span>
         </div>
         <div class="flex items-center gap-2.5">
@@ -116,7 +118,7 @@
       </div>
       <div class="mb-3">
         <div class="flex justify-between items-center mb-1.5">
-          <span class="text-sm font-medium text-zinc-100">Bore Diameter (mm)</span>
+          <span class="text-sm font-medium">Bore Diameter (mm)</span>
           <span class="font-mono text-xs font-medium text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded min-w-[52px] text-center" id="v-bore">8.0</span>
         </div>
         <div class="flex items-center gap-2.5">
@@ -126,7 +128,7 @@
       </div>
       <div class="mb-3">
         <div class="flex justify-between items-center mb-1.5">
-          <span class="text-sm font-medium text-zinc-100">Clearance Coeff.</span>
+          <span class="text-sm font-medium">Clearance Coeff.</span>
           <span class="font-mono text-xs font-medium text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded min-w-[52px] text-center" id="v-cl">0.25</span>
         </div>
         <div class="flex items-center gap-2.5">
@@ -136,7 +138,7 @@
       </div>
       <div>
         <div class="flex justify-between items-center mb-1.5">
-          <span class="text-sm font-medium text-zinc-100">Profile Resolution</span>
+          <span class="text-sm font-medium">Profile Resolution</span>
           <span class="font-mono text-xs font-medium text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded min-w-[52px] text-center" id="v-res">40</span>
         </div>
         <div class="flex items-center gap-2.5">
@@ -149,31 +151,58 @@
         <span id="warn-text"></span>
       </div>
     </div>
+
+    <!-- Gear 2 Parameters (hidden by default) -->
+    <div id="gear2-section" class="p-5 border-b border-zinc-700" style="display:none">
+      <div class="flex items-center justify-between mb-3.5">
+        <span class="text-xs font-bold uppercase tracking-widest text-zinc-500 font-mono">Gear 2</span>
+        <span class="text-xs px-2 py-0.5 bg-cyan-500/10 text-cyan-400 rounded font-mono">Driven</span>
+      </div>
+      <div class="mb-3">
+        <div class="flex justify-between items-center mb-1.5">
+          <span class="text-sm font-medium">Number of Teeth</span>
+          <span class="font-mono text-xs font-medium text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded min-w-[52px] text-center" id="v-teeth2">36</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <input type="range" id="r-teeth2" min="6" max="200" step="1" value="36" class="flex-1">
+          <input type="number" id="n-teeth2" min="4" max="500" step="1" value="36" class="w-[72px] px-1.5 py-1 bg-zinc-800 border border-zinc-700 rounded text-zinc-100 font-mono text-xs text-center outline-none focus:border-cyan-400">
+        </div>
+      </div>
+      <div class="mb-3">
+        <div class="flex justify-between items-center mb-1.5">
+          <span class="text-sm font-medium">Profile Shift (x)</span>
+          <span class="font-mono text-xs font-medium text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded min-w-[52px] text-center" id="v-ps2">0.00</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <input type="range" id="r-ps2" min="-0.6" max="0.6" step="0.01" value="0" class="flex-1">
+          <input type="number" id="n-ps2" min="-1" max="1" step="0.01" value="0" class="w-[72px] px-1.5 py-1 bg-zinc-800 border border-zinc-700 rounded text-zinc-100 font-mono text-xs text-center outline-none focus:border-cyan-400">
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between items-center mb-1.5">
+          <span class="text-sm font-medium">Bore Diameter (mm)</span>
+          <span class="font-mono text-xs font-medium text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded min-w-[52px] text-center" id="v-bore2">12.0</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <input type="range" id="r-bore2" min="0" max="200" step="0.5" value="12" class="flex-1">
+          <input type="number" id="n-bore2" min="0" max="500" step="0.1" value="12" class="w-[72px] px-1.5 py-1 bg-zinc-800 border border-zinc-700 rounded text-zinc-100 font-mono text-xs text-center outline-none focus:border-cyan-400">
+        </div>
+      </div>
+    </div>
+
+    <!-- Display -->
     <div class="p-5 border-b border-zinc-700">
       <div class="flex items-center justify-between mb-3.5">
         <span class="text-xs font-bold uppercase tracking-widest text-zinc-500 font-mono">Display</span>
       </div>
-      <div class="flex items-center gap-2.5 mb-3">
-        <div class="toggle active" id="t-pitch" data-key="showPitch"></div>
-        <label class="text-sm font-medium cursor-pointer text-zinc-300">Pitch circle</label>
-      </div>
-      <div class="flex items-center gap-2.5 mb-3">
-        <div class="toggle active" id="t-base" data-key="showBase"></div>
-        <label class="text-sm font-medium cursor-pointer text-zinc-300">Base circle</label>
-      </div>
-      <div class="flex items-center gap-2.5 mb-3">
-        <div class="toggle" id="t-root" data-key="showRoot"></div>
-        <label class="text-sm font-medium cursor-pointer text-zinc-300">Root circle</label>
-      </div>
-      <div class="flex items-center gap-2.5 mb-3">
-        <div class="toggle" id="t-outer" data-key="showOuter"></div>
-        <label class="text-sm font-medium cursor-pointer text-zinc-300">Addendum circle</label>
-      </div>
-      <div class="flex items-center gap-2.5">
-        <div class="toggle active" id="t-dims" data-key="showDims"></div>
-        <label class="text-sm font-medium cursor-pointer text-zinc-300">Dimension labels</label>
-      </div>
+      <div class="flex items-center gap-2.5 mb-3"><div class="toggle active" id="t-pitch" data-key="showPitch"></div><label class="text-sm font-medium cursor-pointer text-zinc-300">Pitch circle</label></div>
+      <div class="flex items-center gap-2.5 mb-3"><div class="toggle active" id="t-base" data-key="showBase"></div><label class="text-sm font-medium cursor-pointer text-zinc-300">Base circle</label></div>
+      <div class="flex items-center gap-2.5 mb-3"><div class="toggle" id="t-root" data-key="showRoot"></div><label class="text-sm font-medium cursor-pointer text-zinc-300">Root circle</label></div>
+      <div class="flex items-center gap-2.5 mb-3"><div class="toggle" id="t-outer" data-key="showOuter"></div><label class="text-sm font-medium cursor-pointer text-zinc-300">Addendum circle</label></div>
+      <div class="flex items-center gap-2.5"><div class="toggle active" id="t-dims" data-key="showDims"></div><label class="text-sm font-medium cursor-pointer text-zinc-300">Dimension labels</label></div>
     </div>
+
+    <!-- Computed Values -->
     <div class="p-5 border-b border-zinc-700">
       <div class="flex items-center justify-between mb-3.5">
         <span class="text-xs font-bold uppercase tracking-widest text-zinc-500 font-mono">Computed Values</span>
@@ -190,35 +219,51 @@
         <div class="flex justify-between items-center py-1 text-xs"><span class="text-zinc-500">Total Points</span><span class="font-mono text-xs font-medium" id="i-np">--</span></div>
         <div class="flex justify-between items-center py-1 text-xs"><span class="text-zinc-500">Undercut</span><span class="font-mono text-xs font-medium" id="i-uc">--</span></div>
       </div>
+      <!-- Pair-mode info -->
+      <div id="pair-info" class="mt-3 pt-3 border-t border-zinc-700/50 grid grid-cols-2 gap-x-3.5 gap-y-1.5" style="display:none">
+        <div class="flex justify-between items-center py-1 text-xs"><span class="text-cyan-600">G2 Pitch Dia.</span><span class="font-mono text-xs font-medium text-cyan-400" id="i-pd2">--</span></div>
+        <div class="flex justify-between items-center py-1 text-xs"><span class="text-cyan-600">G2 Outside Dia.</span><span class="font-mono text-xs font-medium text-cyan-400" id="i-od2">--</span></div>
+        <div class="flex justify-between items-center py-1 text-xs col-span-2"><span class="text-zinc-500">Center Distance</span><span class="font-mono text-xs font-bold text-amber-400" id="i-cd">--</span></div>
+        <div class="flex justify-between items-center py-1 text-xs"><span class="text-zinc-500">Gear Ratio</span><span class="font-mono text-xs font-medium" id="i-gr">--</span></div>
+        <div class="flex justify-between items-center py-1 text-xs"><span class="text-zinc-500">Speed Ratio</span><span class="font-mono text-xs font-medium" id="i-sr">--</span></div>
+      </div>
     </div>
+
+    <!-- Export -->
     <div class="p-5 mt-auto border-t border-zinc-700">
       <div class="flex items-center justify-between mb-3.5">
         <span class="text-xs font-bold uppercase tracking-widest text-zinc-500 font-mono">Export</span>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-        <button class="bg-amber-500 hover:bg-amber-400 text-zinc-900 font-mono font-bold px-4 py-2.5 rounded-lg md:col-span-2 flex items-center justify-center gap-2 transition-colors active:scale-[0.97]" id="btn-dxf">
+      <div class="grid grid-cols-2 gap-2">
+        <button class="bg-amber-500 hover:bg-amber-400 text-zinc-900 font-mono font-bold px-4 py-2.5 rounded-lg col-span-2 flex items-center justify-center gap-2 transition-colors active:scale-[0.97]" id="btn-dxf">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Export DXF
         </button>
-        <button class="bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-xs font-mono px-3 py-1.5 rounded-lg flex items-center justify-center gap-2 transition-colors active:scale-[0.97]" id="btn-svg">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          SVG
-        </button>
-        <button class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-mono px-3 py-1.5 rounded-lg border border-zinc-700 flex items-center justify-center gap-2 transition-colors active:scale-[0.97]" id="btn-png">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          PNG
-        </button>
+        <button class="bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-xs font-mono px-3 py-1.5 rounded-lg flex items-center justify-center gap-2 transition-colors active:scale-[0.97]" id="btn-svg">SVG</button>
+        <button class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-mono px-3 py-1.5 rounded-lg border border-zinc-700 flex items-center justify-center gap-2 transition-colors active:scale-[0.97]" id="btn-png">PNG</button>
       </div>
     </div>
   </aside>
+
   <main id="viewport" class="flex-1 relative bg-zinc-950 cursor-grab">
     <canvas id="gearCanvas" class="block"></canvas>
     <div class="absolute top-4 left-4 z-10 text-xs text-zinc-500 font-mono bg-zinc-950/85 px-2.5 py-1.5 rounded-lg pointer-events-none" id="canvasInfo">Zoom: 100%</div>
-    <div class="absolute top-4 right-4 z-10 bg-zinc-950/90 px-3.5 py-2.5 rounded-lg border border-zinc-700 text-xs font-mono">
-      <div class="flex items-center gap-2 mb-1"><div class="w-2.5 h-0.5 rounded-sm bg-zinc-100"></div><span class="text-zinc-500">Tooth profile</span></div>
+    <div class="absolute top-4 right-4 z-10 bg-zinc-950/90 px-3.5 py-2.5 rounded-lg border border-zinc-700 text-xs font-mono" id="canvasLegend">
+      <div class="flex items-center gap-2 mb-1"><div class="w-2.5 h-0.5 rounded-sm bg-zinc-100"></div><span class="text-zinc-500">Gear 1</span></div>
+      <div id="legend-g2" class="flex items-center gap-2 mb-1" style="display:none"><div class="w-2.5 h-0.5 rounded-sm bg-cyan-400"></div><span class="text-zinc-500">Gear 2</span></div>
       <div class="flex items-center gap-2 mb-1"><div class="w-2.5 h-0.5 rounded-sm bg-amber-500 opacity-60"></div><span class="text-zinc-500">Pitch circle</span></div>
       <div class="flex items-center gap-2"><div class="w-2.5 h-0.5 rounded-sm bg-blue-500 opacity-60"></div><span class="text-zinc-500">Base circle</span></div>
     </div>
+    <!-- Animation panel -->
+    <div id="anim-panel" class="absolute bottom-4 left-4 z-10 flex items-center gap-3 bg-zinc-900/95 border border-zinc-700 rounded-lg px-3 py-2" style="display:none">
+      <button id="btn-play" class="w-9 h-9 rounded-full bg-amber-500 hover:bg-amber-400 text-zinc-900 flex items-center justify-center cursor-pointer transition-colors flex-shrink-0">
+        <svg id="icon-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21"/></svg>
+        <svg id="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
+      </button>
+      <input type="range" id="r-speed" min="0.1" max="5" step="0.1" value="1" class="w-24">
+      <span class="font-mono text-xs text-zinc-400 min-w-[36px]" id="v-speed">1.0x</span>
+    </div>
+    <!-- Zoom controls -->
     <div class="absolute bottom-4 right-4 flex gap-1.5 z-10">
       <button class="w-9 h-9 border border-zinc-700 bg-zinc-900 rounded-lg text-zinc-400 cursor-pointer flex items-center justify-center transition-all hover:bg-zinc-800 hover:text-zinc-100" id="btn-zoomfit" title="Zoom to fit"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h18"/></svg></button>
       <button class="w-9 h-9 border border-zinc-700 bg-zinc-900 rounded-lg text-zinc-400 cursor-pointer flex items-center justify-center transition-all hover:bg-zinc-800 hover:text-zinc-100" id="btn-zoomin" title="Zoom in"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
@@ -227,42 +272,544 @@
   </main>
 </div>
 <div id="toast" class="px-5 py-2.5 bg-zinc-800 border border-zinc-700 rounded-xl text-sm font-mono z-[200] pointer-events-none whitespace-nowrap shadow-lg text-zinc-100"></div>
+
 <script>
-// INVOLUTE GEAR MATH
-const GearMath={generate(p){const{module:m,teeth:z,pressureAngleDeg:paDeg,profileShift:x,clearance:c,resolution:res}=p;const alpha=paDeg*Math.PI/180;const inv=a=>Math.tan(a)-a;const rp=m*z/2;const rb=rp*Math.cos(alpha);const ra=rp+m*(1+x);const rf=Math.max(rp-m*(1+c-x),0.1);const toothThk=m*(Math.PI/2+2*x*Math.tan(alpha));const halfA=toothThk/(2*rp);const invA=inv(alpha);const angP=2*Math.PI/z;const startR=Math.max(rb,rf);const minZ=Math.ceil(2/(Math.sin(alpha)*Math.sin(alpha)));const hasUndercut=z<minZ&&x<(minZ-z)/(2*minZ);function rAngle(tc,r){if(r<=rb)return tc+halfA+invA;return tc+halfA+invA-inv(Math.acos(Math.min(rb/r,1)))}function lAngle(tc,r){if(r<=rb)return tc-halfA-invA;return tc-halfA-invA+inv(Math.acos(Math.min(rb/r,1)))}const pts=[];const rootN=Math.max(4,Math.round(res/4));const tipN=Math.max(3,Math.round(res/5));const trN=4;for(let i=0;i<z;i++){const tc=i*angP;if(rf<rb){const ba=rAngle(tc,rb);for(let j=0;j<=trN;j++){const t=j/trN;const r=rf+t*(rb-rf);pts.push([r*Math.cos(ba),r*Math.sin(ba)])}}for(let j=0;j<=res;j++){const t=j/res;const r=startR+t*(ra-startR);const a=rAngle(tc,r);pts.push([r*Math.cos(a),r*Math.sin(a)])}const rT=rAngle(tc,ra),lT=lAngle(tc,ra);for(let j=1;j<tipN;j++){const t=j/tipN;const a=rT+t*(lT-rT);pts.push([ra*Math.cos(a),ra*Math.sin(a)])}for(let j=0;j<=res;j++){const t=j/res;const r=ra-t*(ra-startR);const a=lAngle(tc,r);pts.push([r*Math.cos(a),r*Math.sin(a)])}if(rf<rb){const ba=lAngle(tc,rb);for(let j=1;j<=trN;j++){const t=j/trN;const r=rb-t*(rb-rf);pts.push([r*Math.cos(ba),r*Math.sin(ba)])}}const gs=rf<rb?lAngle(tc,rb):lAngle(tc,startR);const nTc=(i+1)*angP;const ge=rf<rb?rAngle(nTc,rb):rAngle(nTc,startR);for(let j=1;j<=rootN;j++){const t=j/rootN;const a=gs+t*(ge-gs);pts.push([rf*Math.cos(a),rf*Math.sin(a)])}}const cl=[pts[0]];for(let i=1;i<pts.length;i++){const dx=pts[i][0]-cl[cl.length-1][0],dy=pts[i][1]-cl[cl.length-1][1];if(dx*dx+dy*dy>1e-12)cl.push(pts[i])}if(cl.length>2){const dx=cl[cl.length-1][0]-cl[0][0],dy=cl[cl.length-1][1]-cl[0][1];if(dx*dx+dy*dy<1e-10)cl.pop()}return{points:cl,radii:{pitch:rp,base:rb,addendum:ra,root:rf},info:{pitchDia:2*rp,outerDia:2*ra,rootDia:2*rf,baseDia:2*rb,circPitch:Math.PI*m,toothThk,addendum:m*(1+x),dedendum:m*(1+c-x),hasUndercut,minTeethNoUndercut:minZ}}}};
+/* ═══════════════════════════════════════════════════════════════
+   INVOLUTE GEAR MATH
+   ═══════════════════════════════════════════════════════════════ */
+const GearMath = {
+  generate(p) {
+    const { module: m, teeth: z, pressureAngleDeg: paDeg, profileShift: x, clearance: c, resolution: res } = p;
+    const alpha = paDeg * Math.PI / 180;
+    const inv = a => Math.tan(a) - a;
+    const rp = m * z / 2, rb = rp * Math.cos(alpha);
+    const ra = rp + m * (1 + x), rf = Math.max(rp - m * (1 + c - x), 0.1);
+    const toothThk = m * (Math.PI / 2 + 2 * x * Math.tan(alpha));
+    const halfA = toothThk / (2 * rp), invA = inv(alpha);
+    const angP = 2 * Math.PI / z, startR = Math.max(rb, rf);
+    const minZ = Math.ceil(2 / (Math.sin(alpha) ** 2));
+    const hasUndercut = z < minZ && x < (minZ - z) / (2 * minZ);
 
-// DXF EXPORT
-const DXFExport={generate(pts,bore,radii){const L=[];const w=s=>L.push(s);w('0');w('SECTION');w('2');w('HEADER');w('9');w('$ACADVER');w('1');w('AC1015');w('9');w('$INSUNITS');w('70');w('4');w('9');w('$MEASUREMENT');w('70');w('1');w('0');w('ENDSEC');w('0');w('SECTION');w('2');w('TABLES');w('0');w('TABLE');w('2');w('LAYER');w('70');w('4');w('0');w('LAYER');w('2');w('GEAR_PROFILE');w('70');w('0');w('62');w('7');w('6');w('CONTINUOUS');w('0');w('LAYER');w('2');w('BORE');w('70');w('0');w('62');w('1');w('6');w('CONTINUOUS');w('0');w('LAYER');w('2');w('PITCH_CIRCLE');w('70');w('0');w('62');w('3');w('6');w('DASHDOT');w('0');w('LAYER');w('2');w('BASE_CIRCLE');w('70');w('0');w('62');w('5');w('6');w('DASHED');w('0');w('ENDTAB');w('0');w('ENDSEC');w('0');w('SECTION');w('2');w('ENTITIES');w('0');w('LWPOLYLINE');w('8');w('GEAR_PROFILE');w('90');w(String(pts.length));w('70');w('1');for(const[x,y]of pts){w('10');w(x.toFixed(6));w('20');w(y.toFixed(6))}if(bore>0){w('0');w('CIRCLE');w('8');w('BORE');w('10');w('0.000000');w('20');w('0.000000');w('40');w((bore/2).toFixed(6))}w('0');w('CIRCLE');w('8');w('PITCH_CIRCLE');w('10');w('0.000000');w('20');w('0.000000');w('40');w(radii.pitch.toFixed(6));w('0');w('CIRCLE');w('8');w('BASE_CIRCLE');w('10');w('0.000000');w('20');w('0.000000');w('40');w(radii.base.toFixed(6));w('0');w('ENDSEC');w('0');w('EOF');return L.join('\n')}};
+    const rAng = (tc, r) => r <= rb ? tc + halfA + invA : tc + halfA + invA - inv(Math.acos(Math.min(rb / r, 1)));
+    const lAng = (tc, r) => r <= rb ? tc - halfA - invA : tc - halfA - invA + inv(Math.acos(Math.min(rb / r, 1)));
 
-// SVG EXPORT
-const SVGExport={generate(pts,bore,radii,info){const margin=5;const ra=radii.addendum;const sz=2*ra+2*margin;let s=`<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${sz.toFixed(2)}mm" height="${sz.toFixed(2)}mm" viewBox="${(-ra-margin).toFixed(4)} ${(-ra-margin).toFixed(4)} ${sz.toFixed(4)} ${sz.toFixed(4)}">\n`;s+=`<title>Involute Spur Gear z=${info.pitchDia.toFixed(1)/(radii.pitch*2)*radii.pitch*2|0}</title>\n`;let d=`M ${pts[0][0].toFixed(6)},${(-pts[0][1]).toFixed(6)}`;for(let i=1;i<pts.length;i++)d+=` L ${pts[i][0].toFixed(6)},${(-pts[i][1]).toFixed(6)}`;d+=' Z';s+=`<path d="${d}" fill="none" stroke="#000" stroke-width="0.2"/>\n`;if(bore>0)s+=`<circle cx="0" cy="0" r="${(bore/2).toFixed(6)}" fill="none" stroke="#000" stroke-width="0.2"/>\n`;s+=`<circle cx="0" cy="0" r="${radii.pitch.toFixed(6)}" fill="none" stroke="#888" stroke-width="0.1" stroke-dasharray="1,1"/>\n`;s+=`<circle cx="0" cy="0" r="${radii.base.toFixed(6)}" fill="none" stroke="#00f" stroke-width="0.1" stroke-dasharray="0.5,0.5"/>\n`;s+=`</svg>`;return s}};
+    const pts = [], rootN = Math.max(4, Math.round(res / 4)), tipN = Math.max(3, Math.round(res / 5)), trN = 4;
+    for (let i = 0; i < z; i++) {
+      const tc = i * angP;
+      if (rf < rb) { const ba = rAng(tc, rb); for (let j = 0; j <= trN; j++) { const r = rf + (j / trN) * (rb - rf); pts.push([r * Math.cos(ba), r * Math.sin(ba)]); } }
+      for (let j = 0; j <= res; j++) { const r = startR + (j / res) * (ra - startR); const a = rAng(tc, r); pts.push([r * Math.cos(a), r * Math.sin(a)]); }
+      const rT = rAng(tc, ra), lT = lAng(tc, ra);
+      for (let j = 1; j < tipN; j++) { const a = rT + (j / tipN) * (lT - rT); pts.push([ra * Math.cos(a), ra * Math.sin(a)]); }
+      for (let j = 0; j <= res; j++) { const r = ra - (j / res) * (ra - startR); const a = lAng(tc, r); pts.push([r * Math.cos(a), r * Math.sin(a)]); }
+      if (rf < rb) { const ba = lAng(tc, rb); for (let j = 1; j <= trN; j++) { const r = rb - (j / trN) * (rb - rf); pts.push([r * Math.cos(ba), r * Math.sin(ba)]); } }
+      const gs = rf < rb ? lAng(tc, rb) : lAng(tc, startR);
+      const ge = rf < rb ? rAng((i + 1) * angP, rb) : rAng((i + 1) * angP, startR);
+      for (let j = 1; j <= rootN; j++) { const a = gs + (j / rootN) * (ge - gs); pts.push([rf * Math.cos(a), rf * Math.sin(a)]); }
+    }
+    const cl = [pts[0]];
+    for (let i = 1; i < pts.length; i++) { const dx = pts[i][0] - cl[cl.length - 1][0], dy = pts[i][1] - cl[cl.length - 1][1]; if (dx * dx + dy * dy > 1e-12) cl.push(pts[i]); }
+    if (cl.length > 2) { const dx = cl[cl.length - 1][0] - cl[0][0], dy = cl[cl.length - 1][1] - cl[0][1]; if (dx * dx + dy * dy < 1e-10) cl.pop(); }
+    return { points: cl, radii: { pitch: rp, base: rb, addendum: ra, root: rf },
+      info: { pitchDia: 2 * rp, outerDia: 2 * ra, rootDia: 2 * rf, baseDia: 2 * rb, circPitch: Math.PI * m, toothThk, addendum: m * (1 + x), dedendum: m * (1 + c - x), hasUndercut, minTeethNoUndercut: minZ } };
+  }
+};
 
-// CANVAS RENDERER
-const Renderer=(()=>{let canvas,ctx;let panX=0,panY=0,zoom=1;let isDrag=false,lastM={x:0,y:0};let gear=null;let dOpts={showPitch:true,showBase:true,showRoot:false,showOuter:false,showDims:true};const dpr=()=>Math.min(window.devicePixelRatio||1,2);
-function init(c){canvas=c;ctx=c.getContext('2d');resize();bindEv()}
-function resize(){const p=canvas.parentElement;const w=p.clientWidth,h=p.clientHeight,d=dpr();canvas.width=w*d;canvas.height=h*d;canvas.style.width=w+'px';canvas.style.height=h+'px';draw()}
-function toS(wx,wy){const d=dpr(),cx=canvas.width/(2*d),cy=canvas.height/(2*d);return[(wx*zoom+panX+cx)*d,(-wy*zoom+panY+cy)*d]}
-function toW(sx,sy){const d=dpr(),cx=canvas.width/(2*d),cy=canvas.height/(2*d);return[(sx/d-panX-cx)/zoom,-(sy/d-panY-cy)/zoom]}
-function draw(){if(!canvas)return;const d=dpr(),w=canvas.width,h=canvas.height;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,w,h);ctx.fillStyle='#09090b';ctx.fillRect(0,0,w,h);drawGrid();if(gear)drawGear();updateInfo()}
-function drawGrid(){const d=dpr(),w=canvas.width/d,h=canvas.height/d;const raw=50/zoom,mag=Math.pow(10,Math.floor(Math.log10(raw))),norm=raw/mag;let sp;if(norm<2)sp=mag;else if(norm<5)sp=2*mag;else sp=5*mag;const mSp=sp/5;const[wx0,wy0]=toW(0,0),[wx1,wy1]=toW(w*d,h*d);const mnX=Math.min(wx0,wx1),mxX=Math.max(wx0,wx1),mnY=Math.min(wy0,wy1),mxY=Math.max(wy0,wy1);if(mSp*zoom>4){ctx.strokeStyle='rgba(63,63,70,0.3)';ctx.lineWidth=0.5*d;ctx.beginPath();for(let x=Math.floor(mnX/mSp)*mSp;x<=mxX;x+=mSp){const[sx]=toS(x,0);ctx.moveTo(sx,0);ctx.lineTo(sx,h*d)}for(let y=Math.floor(mnY/mSp)*mSp;y<=mxY;y+=mSp){const[,sy]=toS(0,y);ctx.moveTo(0,sy);ctx.lineTo(w*d,sy)}ctx.stroke()}ctx.strokeStyle='rgba(63,63,70,0.7)';ctx.lineWidth=0.8*d;ctx.beginPath();for(let x=Math.floor(mnX/sp)*sp;x<=mxX;x+=sp){const[sx]=toS(x,0);ctx.moveTo(sx,0);ctx.lineTo(sx,h*d)}for(let y=Math.floor(mnY/sp)*sp;y<=mxY;y+=sp){const[,sy]=toS(0,y);ctx.moveTo(0,sy);ctx.lineTo(w*d,sy)}ctx.stroke();const[ox,oy]=toS(0,0);ctx.strokeStyle='rgba(161,161,170,0.3)';ctx.lineWidth=1*d;ctx.beginPath();ctx.moveTo(ox,0);ctx.lineTo(ox,h*d);ctx.moveTo(0,oy);ctx.lineTo(w*d,oy);ctx.stroke();ctx.fillStyle='rgba(161,161,170,0.5)';ctx.beginPath();ctx.arc(ox,oy,3*d,0,Math.PI*2);ctx.fill();if(dOpts.showDims){ctx.font=`${10*d}px Inter,sans-serif`;ctx.fillStyle='rgba(161,161,170,0.5)';ctx.textAlign='left';ctx.textBaseline='top';for(let x=Math.floor(mnX/sp)*sp;x<=mxX;x+=sp){if(Math.abs(x)<sp*0.01)continue;const[sx]=toS(x,0);ctx.fillText(fmtN(x),sx+3*d,oy+4*d)}ctx.textAlign='right';ctx.textBaseline='middle';for(let y=Math.floor(mnY/sp)*sp;y<=mxY;y+=sp){if(Math.abs(y)<sp*0.01)continue;const[,sy]=toS(0,y);ctx.fillText(fmtN(y),ox-4*d,sy)}}}
-function fmtN(v){return Math.abs(v)>=1?Number(v.toFixed(1)).toString():v.toFixed(2)}
-function drawGear(){const d=dpr(),{points:pts,radii:r,bore}=gear;function dCirc(rad,col,dash){const[cx,cy]=toS(0,0);ctx.strokeStyle=col;ctx.lineWidth=1*d;ctx.setLineDash(dash.map(v=>v*d));ctx.beginPath();ctx.arc(cx,cy,rad*zoom*d,0,Math.PI*2);ctx.stroke();ctx.setLineDash([])}if(dOpts.showRoot)dCirc(r.root,'rgba(239,68,68,0.4)',[4,3]);if(dOpts.showBase)dCirc(r.base,'rgba(59,130,246,0.45)',[3,3]);if(dOpts.showPitch)dCirc(r.pitch,'rgba(245,158,11,0.5)',[6,3]);if(dOpts.showOuter)dCirc(r.addendum,'rgba(167,139,250,0.4)',[4,3]);ctx.beginPath();const[fx,fy]=toS(pts[0][0],pts[0][1]);ctx.moveTo(fx,fy);for(let i=1;i<pts.length;i++){const[px,py]=toS(pts[i][0],pts[i][1]);ctx.lineTo(px,py)}ctx.closePath();ctx.fillStyle='rgba(244,244,245,0.04)';ctx.fill();ctx.strokeStyle='rgba(244,244,245,0.85)';ctx.lineWidth=1.5*d;ctx.stroke();if(bore>0){const[cx,cy]=toS(0,0);ctx.strokeStyle='rgba(244,244,245,0.6)';ctx.lineWidth=1.2*d;ctx.beginPath();ctx.arc(cx,cy,bore/2*zoom*d,0,Math.PI*2);ctx.stroke()}if(dOpts.showDims){const la=Math.PI*0.28;function dimL(rad,lbl,col){const[lx,ly]=toS(rad*Math.cos(la),rad*Math.sin(la));ctx.font=`500 ${10*d}px Inter,sans-serif`;ctx.fillStyle=col;ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText(lbl+' \u2300'+(2*rad).toFixed(2),lx+5*d,ly-3*d)}if(dOpts.showPitch)dimL(r.pitch,'PD','rgba(245,158,11,0.7)');if(dOpts.showBase)dimL(r.base,'BD','rgba(59,130,246,0.6)');if(dOpts.showRoot)dimL(r.root,'RD','rgba(239,68,68,0.6)');if(dOpts.showOuter)dimL(r.addendum,'OD','rgba(167,139,250,0.6)')}}
-function updateInfo(){document.getElementById('canvasInfo').textContent='Zoom: '+(zoom*100).toFixed(0)+'%'}
-function zoomToFit(){if(!gear)return;const ra=gear.radii.addendum,d=dpr(),w=canvas.width/d,h=canvas.height/d,pad=60;zoom=Math.min((w-pad)/(2*ra),(h-pad)/(2*ra));panX=0;panY=0;draw()}
-function bindEv(){canvas.addEventListener('wheel',e=>{e.preventDefault();const f=e.deltaY>0?0.9:1.1;const d=dpr(),rect=canvas.getBoundingClientRect();const mx=e.clientX-rect.left,my=e.clientY-rect.top;const cx=canvas.width/(2*d),cy=canvas.height/(2*d);const wx=(mx-panX-cx)/zoom,wy=-(my-panY-cy)/zoom;zoom*=f;zoom=Math.max(0.01,Math.min(zoom,500));panX=mx-cx-wx*zoom;panY=my-cy+wy*zoom;draw()},{passive:false});canvas.addEventListener('mousedown',e=>{isDrag=true;lastM={x:e.clientX,y:e.clientY}});window.addEventListener('mousemove',e=>{if(!isDrag)return;panX+=e.clientX-lastM.x;panY+=e.clientY-lastM.y;lastM={x:e.clientX,y:e.clientY};draw()});window.addEventListener('mouseup',()=>{isDrag=false});let ltd=null;canvas.addEventListener('touchstart',e=>{if(e.touches.length===1){isDrag=true;lastM={x:e.touches[0].clientX,y:e.touches[0].clientY}}else if(e.touches.length===2){isDrag=false;const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;ltd=Math.sqrt(dx*dx+dy*dy)}e.preventDefault()},{passive:false});canvas.addEventListener('touchmove',e=>{if(e.touches.length===1&&isDrag){panX+=e.touches[0].clientX-lastM.x;panY+=e.touches[0].clientY-lastM.y;lastM={x:e.touches[0].clientX,y:e.touches[0].clientY};draw()}else if(e.touches.length===2&&ltd!==null){const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;const dist=Math.sqrt(dx*dx+dy*dy);zoom*=dist/ltd;zoom=Math.max(0.01,Math.min(zoom,500));ltd=dist;draw()}e.preventDefault()},{passive:false});canvas.addEventListener('touchend',()=>{isDrag=false;ltd=null});window.addEventListener('resize',resize)}
-function setGear(g,b){gear={...g,bore:b};draw()}
-function setDO(k,v){dOpts[k]=v;draw()}
-return{init,setGear,setDisplayOpt:setDO,zoomToFit,zoomIn(){zoom*=1.3;draw()},zoomOut(){zoom*=0.77;draw()},draw,resize,getCanvas(){return canvas}}})();
+/* ═══════════════════════════════════════════════════════════════
+   TRANSFORM HELPERS
+   ═══════════════════════════════════════════════════════════════ */
+function transformPts(pts, angle, tx, ty) {
+  const c = Math.cos(angle), s = Math.sin(angle);
+  return pts.map(([x, y]) => [x * c - y * s + tx, x * s + y * c + ty]);
+}
 
-// APP CONTROLLER
-(function(){const $=s=>document.querySelector(s);let result=null,params={};
-function toast(m){const e=$('#toast');e.textContent=m;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2500)}
-function dl(c,fn,mime){const b=typeof c==='string'?new Blob([c],{type:mime}):c;const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=fn;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove()},100)}
-function bindCtl(rId,nId,vId,fmt){const r=$(rId),n=$(nId),v=$(vId);function sync(src){const val=parseFloat(src.value);if(isNaN(val))return;if(src===r)n.value=val;else r.value=Math.max(r.min,Math.min(r.max,val));v.textContent=fmt(val);updateGear()}r.addEventListener('input',()=>sync(r));n.addEventListener('input',()=>sync(n));n.addEventListener('change',()=>sync(n))}
-function readP(){return{module:parseFloat($('#n-mod').value)||2,teeth:parseInt($('#n-teeth').value)||24,pressureAngleDeg:parseFloat($('#s-pa').value),profileShift:parseFloat($('#n-ps').value)||0,bore:parseFloat($('#n-bore').value)||0,clearance:parseFloat($('#n-cl').value)||0.25,resolution:parseInt($('#n-res').value)||40}}
-function updateGear(){params=readP();const rp=params.module*params.teeth/2;const rf=Math.max(rp-params.module*(1+params.clearance-params.profileShift),0.1);const maxB=2*rf-0.5;if(params.bore>maxB&&maxB>0){params.bore=Math.max(0,Math.round(maxB*10)/10);$('#r-bore').value=params.bore;$('#n-bore').value=params.bore;$('#v-bore').textContent=params.bore.toFixed(1)}result=GearMath.generate(params);const{info,points}=result;const mm=v=>v.toFixed(3);$('#i-pd').textContent=mm(info.pitchDia);$('#i-od').textContent=mm(info.outerDia);$('#i-rd').textContent=mm(info.rootDia);$('#i-bd').textContent=mm(info.baseDia);$('#i-cp').textContent=mm(info.circPitch);$('#i-tt').textContent=mm(info.toothThk);$('#i-ha').textContent=mm(info.addendum);$('#i-hf').textContent=mm(info.dedendum);$('#i-np').textContent=points.length;$('#i-uc').textContent=info.hasUndercut?'Yes':'No';$('#i-uc').style.color=info.hasUndercut?'#ef4444':'#22c55e';const warn=$('#warn-undercut'),wt=$('#warn-text');if(info.toothThk<=0){wt.textContent='Tooth thickness is zero or negative. Reduce profile shift.';warn.classList.add('show');warn.className='warn warn-red show'}else if(info.hasUndercut){wt.textContent='Undercut will occur. Min '+info.minTeethNoUndercut+' teeth needed at this pressure angle, or increase profile shift.';warn.classList.add('show');warn.className='warn warn-orange show'}else if(params.bore>=2*rf){wt.textContent='Bore diameter exceeds root circle.';warn.classList.add('show');warn.className='warn warn-red show'}else{warn.classList.remove('show')}Renderer.setGear(result,params.bore)}
-function init(){Renderer.init($('#gearCanvas'));bindCtl('#r-mod','#n-mod','#v-mod',v=>v.toFixed(1));bindCtl('#r-teeth','#n-teeth','#v-teeth',v=>String(Math.round(v)));bindCtl('#r-ps','#n-ps','#v-ps',v=>v.toFixed(2));bindCtl('#r-bore','#n-bore','#v-bore',v=>v.toFixed(1));bindCtl('#r-cl','#n-cl','#v-cl',v=>v.toFixed(2));bindCtl('#r-res','#n-res','#v-res',v=>String(Math.round(v)));$('#s-pa').addEventListener('change',updateGear);document.querySelectorAll('.toggle').forEach(el=>{el.addEventListener('click',()=>{el.classList.toggle('active');Renderer.setDisplayOpt(el.dataset.key,el.classList.contains('active'))})});$('#btn-zoomfit').addEventListener('click',()=>Renderer.zoomToFit());$('#btn-zoomin').addEventListener('click',()=>Renderer.zoomIn());$('#btn-zoomout').addEventListener('click',()=>Renderer.zoomOut());$('#btn-dxf').addEventListener('click',()=>{if(!result)return;toast('Generating DXF...');setTimeout(()=>{const dxf=DXFExport.generate(result.points,params.bore,result.radii);dl(dxf,`gear_z${params.teeth}_m${params.module}.dxf`,'application/dxf');toast('DXF exported!')},30)});$('#btn-svg').addEventListener('click',()=>{if(!result)return;toast('Generating SVG...');setTimeout(()=>{const svg=SVGExport.generate(result.points,params.bore,result.radii,result.info);dl(svg,`gear_z${params.teeth}_m${params.module}.svg`,'image/svg+xml');toast('SVG exported!')},30)});$('#btn-png').addEventListener('click',()=>{if(!result)return;toast('Exporting PNG...');setTimeout(()=>{Renderer.getCanvas().toBlob(blob=>{dl(blob,`gear_z${params.teeth}_m${params.module}.png`,'image/png')})},30)});updateGear();requestAnimationFrame(()=>Renderer.zoomToFit())}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{})})();
+/* ═══════════════════════════════════════════════════════════════
+   DXF EXPORT
+   ═══════════════════════════════════════════════════════════════ */
+const DXFExport = {
+  generate(gear1pts, bore1, radii1, gear2pts, bore2, radii2, cd) {
+    const L = [], w = s => L.push(s);
+    w('0');w('SECTION');w('2');w('HEADER');w('9');w('$ACADVER');w('1');w('AC1015');w('9');w('$INSUNITS');w('70');w('4');w('9');w('$MEASUREMENT');w('70');w('1');w('0');w('ENDSEC');
+    w('0');w('SECTION');w('2');w('TABLES');w('0');w('TABLE');w('2');w('LAYER');w('70');w('6');
+    const addLayer = (name, color) => { w('0');w('LAYER');w('2');w(name);w('70');w('0');w('62');w(String(color));w('6');w('CONTINUOUS'); };
+    addLayer('GEAR_1', 7); addLayer('GEAR_2', 4); addLayer('BORE', 1); addLayer('PITCH_CIRCLE', 3); addLayer('BASE_CIRCLE', 5); addLayer('CENTER_LINE', 2);
+    w('0');w('ENDTAB');w('0');w('ENDSEC');
+    w('0');w('SECTION');w('2');w('ENTITIES');
+    const writePoly = (pts, layer) => { w('0');w('LWPOLYLINE');w('8');w(layer);w('90');w(String(pts.length));w('70');w('1'); for (const [x, y] of pts) { w('10');w(x.toFixed(6));w('20');w(y.toFixed(6)); } };
+    const writeCircle = (cx, cy, r, layer) => { w('0');w('CIRCLE');w('8');w(layer);w('10');w(cx.toFixed(6));w('20');w(cy.toFixed(6));w('40');w(r.toFixed(6)); };
+    writePoly(gear1pts, 'GEAR_1');
+    if (bore1 > 0) writeCircle(0, 0, bore1 / 2, 'BORE');
+    writeCircle(0, 0, radii1.pitch, 'PITCH_CIRCLE');
+    writeCircle(0, 0, radii1.base, 'BASE_CIRCLE');
+    if (gear2pts) {
+      writePoly(gear2pts, 'GEAR_2');
+      if (bore2 > 0) writeCircle(cd, 0, bore2 / 2, 'BORE');
+      writeCircle(cd, 0, radii2.pitch, 'PITCH_CIRCLE');
+      writeCircle(cd, 0, radii2.base, 'BASE_CIRCLE');
+      // center line
+      w('0');w('LINE');w('8');w('CENTER_LINE');w('10');w('0');w('20');w('0');w('11');w(cd.toFixed(6));w('21');w('0');
+    }
+    w('0');w('ENDSEC');w('0');w('EOF');
+    return L.join('\n');
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   SVG EXPORT
+   ═══════════════════════════════════════════════════════════════ */
+const SVGExport = {
+  generate(g1pts, bore1, radii1, g2pts, bore2, radii2, cd) {
+    const margin = 5;
+    const ra1 = radii1.addendum, ra2 = radii2 ? radii2.addendum : 0;
+    const left = -ra1 - margin, top_ = -Math.max(ra1, ra2) - margin;
+    const right = (cd || 0) + Math.max(ra1, ra2) + margin;
+    const bottom = Math.max(ra1, ra2) + margin;
+    const vw = right - left, vh = bottom - top_;
+    const ptsToD = pts => { let d = `M ${pts[0][0].toFixed(6)},${(-pts[0][1]).toFixed(6)}`; for (let i = 1; i < pts.length; i++) d += ` L ${pts[i][0].toFixed(6)},${(-pts[i][1]).toFixed(6)}`; return d + ' Z'; };
+    let s = `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${vw.toFixed(2)}mm" height="${vh.toFixed(2)}mm" viewBox="${left.toFixed(4)} ${top_.toFixed(4)} ${vw.toFixed(4)} ${vh.toFixed(4)}">\n`;
+    s += `<path d="${ptsToD(g1pts)}" fill="none" stroke="#000" stroke-width="0.2"/>\n`;
+    if (bore1 > 0) s += `<circle cx="0" cy="0" r="${(bore1 / 2).toFixed(6)}" fill="none" stroke="#000" stroke-width="0.2"/>\n`;
+    s += `<circle cx="0" cy="0" r="${radii1.pitch.toFixed(6)}" fill="none" stroke="#888" stroke-width="0.1" stroke-dasharray="1,1"/>\n`;
+    if (g2pts) {
+      s += `<path d="${ptsToD(g2pts)}" fill="none" stroke="#0088cc" stroke-width="0.2"/>\n`;
+      if (bore2 > 0) s += `<circle cx="${cd.toFixed(6)}" cy="0" r="${(bore2 / 2).toFixed(6)}" fill="none" stroke="#0088cc" stroke-width="0.2"/>\n`;
+      s += `<circle cx="${cd.toFixed(6)}" cy="0" r="${radii2.pitch.toFixed(6)}" fill="none" stroke="#888" stroke-width="0.1" stroke-dasharray="1,1"/>\n`;
+    }
+    s += `</svg>`; return s;
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   CANVAS RENDERER (with animation support)
+   ═══════════════════════════════════════════════════════════════ */
+const Renderer = (() => {
+  let canvas, ctx;
+  let panX = 0, panY = 0, zoom = 1, isDrag = false, lastM = { x: 0, y: 0 };
+  let dOpts = { showPitch: true, showBase: true, showRoot: false, showOuter: false, showDims: true };
+  const D = () => Math.min(window.devicePixelRatio || 1, 2);
+
+  // Gear state
+  let pairMode = false;
+  let g1 = null, g2 = null; // { points, radii, bore }
+  let centerDist = 0, z1 = 24, z2 = 36;
+  let g1Angle = 0, phase2 = 0;
+  let isPlaying = false, animSpeed = 1, animId = null, lastTime = null;
+
+  function init(c) { canvas = c; ctx = c.getContext('2d'); resize(); bindEv(); }
+  function resize() { const p = canvas.parentElement, w = p.clientWidth, h = p.clientHeight, d = D(); canvas.width = w * d; canvas.height = h * d; canvas.style.width = w + 'px'; canvas.style.height = h + 'px'; draw(); }
+  function toS(wx, wy) { const d = D(), cx = canvas.width / (2 * d), cy = canvas.height / (2 * d); return [(wx * zoom + panX + cx) * d, (-wy * zoom + panY + cy) * d]; }
+  function toW(sx, sy) { const d = D(), cx = canvas.width / (2 * d), cy = canvas.height / (2 * d); return [(sx / d - panX - cx) / zoom, -(sy / d - panY - cy) / zoom]; }
+
+  function setGear(gear, bore) { pairMode = false; g1 = { points: gear.points, radii: gear.radii, bore }; g2 = null; z1 = 0; stopAnim(); draw(); }
+
+  function setGearPair(gear1, bore1, gear2, bore2, cd, teeth1, teeth2) {
+    pairMode = true;
+    g1 = { points: gear1.points, radii: gear1.radii, bore: bore1 };
+    g2 = { points: gear2.points, radii: gear2.radii, bore: bore2 };
+    centerDist = cd; z1 = teeth1; z2 = teeth2;
+    phase2 = Math.PI - Math.PI / z2;
+    draw();
+  }
+
+  function play() { if (isPlaying) return; isPlaying = true; lastTime = null; animId = requestAnimationFrame(animate); }
+  function pause() { isPlaying = false; if (animId) { cancelAnimationFrame(animId); animId = null; } }
+  function stopAnim() { pause(); g1Angle = 0; }
+  function setSpeed(s) { animSpeed = s; }
+
+  function animate(ts) {
+    if (!lastTime) lastTime = ts;
+    const dt = Math.min((ts - lastTime) / 1000, 0.05);
+    lastTime = ts;
+    g1Angle += 0.6 * animSpeed * dt;
+    draw();
+    if (isPlaying) animId = requestAnimationFrame(animate);
+  }
+
+  function draw() {
+    if (!canvas) return;
+    const d = D(), w = canvas.width, h = canvas.height;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#09090b';
+    ctx.fillRect(0, 0, w, h);
+    drawGrid();
+    if (pairMode && g1 && g2) drawPair();
+    else if (g1) drawSingle();
+    updateInfo();
+  }
+
+  function drawSingle() {
+    const d = D(), { points, radii: r, bore } = g1;
+    drawRefCircles(r, 0, 0);
+    drawProfile(points, 0, 0, 0, 'rgba(244,244,245,0.85)', 'rgba(244,244,245,0.04)');
+    if (bore > 0) drawBore(bore, 0, 0, 'rgba(244,244,245,0.6)');
+    if (dOpts.showDims) drawDimLabels(r, 0, 0, '');
+  }
+
+  function drawPair() {
+    const d = D();
+    const angle2 = phase2 - g1Angle * z1 / z2;
+
+    // Line of centers
+    const [lx1, ly1] = toS(0, 0), [lx2, ly2] = toS(centerDist, 0);
+    ctx.strokeStyle = 'rgba(161,161,170,0.15)';
+    ctx.lineWidth = 1 * D();
+    ctx.setLineDash([6 * D(), 4 * D()]);
+    ctx.beginPath(); ctx.moveTo(lx1, ly1); ctx.lineTo(lx2, ly2); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Pitch point
+    const pitchPt = g1.radii.pitch;
+    const [ppx, ppy] = toS(pitchPt, 0);
+    ctx.fillStyle = 'rgba(245,158,11,0.6)';
+    ctx.beginPath(); ctx.arc(ppx, ppy, 3 * D(), 0, Math.PI * 2); ctx.fill();
+
+    // Reference circles
+    drawRefCircles(g1.radii, 0, 0);
+    drawRefCircles(g2.radii, centerDist, 0);
+
+    // Gear profiles with rotation
+    drawProfile(g1.points, 0, 0, g1Angle, 'rgba(244,244,245,0.85)', 'rgba(244,244,245,0.04)');
+    drawProfile(g2.points, centerDist, 0, angle2, 'rgba(34,211,238,0.8)', 'rgba(34,211,238,0.03)');
+
+    // Bores
+    if (g1.bore > 0) drawBore(g1.bore, 0, 0, 'rgba(244,244,245,0.5)');
+    if (g2.bore > 0) drawBore(g2.bore, centerDist, 0, 'rgba(34,211,238,0.5)');
+
+    // Center dots
+    const [c1x, c1y] = toS(0, 0), [c2x, c2y] = toS(centerDist, 0);
+    ctx.fillStyle = 'rgba(244,244,245,0.4)';
+    ctx.beginPath(); ctx.arc(c1x, c1y, 2.5 * D(), 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(34,211,238,0.4)';
+    ctx.beginPath(); ctx.arc(c2x, c2y, 2.5 * D(), 0, Math.PI * 2); ctx.fill();
+
+    if (dOpts.showDims) {
+      drawDimLabels(g1.radii, 0, 0, 'G1 ');
+      drawDimLabels(g2.radii, centerDist, 0, 'G2 ');
+    }
+  }
+
+  function drawProfile(pts, ox, oy, angle, stroke, fill) {
+    const d = D(), cos = Math.cos(angle), sin = Math.sin(angle);
+    ctx.beginPath();
+    for (let i = 0; i < pts.length; i++) {
+      const [x, y] = pts[i];
+      const rx = x * cos - y * sin + ox, ry = x * sin + y * cos + oy;
+      const [sx, sy] = toS(rx, ry);
+      if (i === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+    }
+    ctx.closePath();
+    ctx.fillStyle = fill; ctx.fill();
+    ctx.strokeStyle = stroke; ctx.lineWidth = 1.5 * d; ctx.stroke();
+  }
+
+  function drawBore(bore, ox, oy, color) {
+    const [cx, cy] = toS(ox, oy);
+    ctx.strokeStyle = color; ctx.lineWidth = 1.2 * D();
+    ctx.beginPath(); ctx.arc(cx, cy, bore / 2 * zoom * D(), 0, Math.PI * 2); ctx.stroke();
+  }
+
+  function drawRefCircles(r, ox, oy) {
+    const d = D();
+    const circ = (rad, col, dash) => {
+      const [cx, cy] = toS(ox, oy);
+      ctx.strokeStyle = col; ctx.lineWidth = 1 * d;
+      ctx.setLineDash(dash.map(v => v * d));
+      ctx.beginPath(); ctx.arc(cx, cy, rad * zoom * d, 0, Math.PI * 2); ctx.stroke();
+      ctx.setLineDash([]);
+    };
+    if (dOpts.showRoot) circ(r.root, 'rgba(239,68,68,0.35)', [4, 3]);
+    if (dOpts.showBase) circ(r.base, 'rgba(59,130,246,0.4)', [3, 3]);
+    if (dOpts.showPitch) circ(r.pitch, 'rgba(245,158,11,0.45)', [6, 3]);
+    if (dOpts.showOuter) circ(r.addendum, 'rgba(167,139,250,0.35)', [4, 3]);
+  }
+
+  function drawDimLabels(r, ox, oy, prefix) {
+    const d = D(), la = Math.PI * 0.28;
+    const dimL = (rad, lbl, col) => {
+      const [lx, ly] = toS(ox + rad * Math.cos(la), rad * Math.sin(la));
+      ctx.font = `500 ${10 * d}px Inter,sans-serif`; ctx.fillStyle = col;
+      ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+      ctx.fillText(prefix + lbl + ' \u2300' + (2 * rad).toFixed(2), lx + 5 * d, ly - 3 * d);
+    };
+    if (dOpts.showPitch) dimL(r.pitch, 'PD', 'rgba(245,158,11,0.65)');
+    if (dOpts.showBase) dimL(r.base, 'BD', 'rgba(59,130,246,0.55)');
+    if (dOpts.showRoot) dimL(r.root, 'RD', 'rgba(239,68,68,0.55)');
+    if (dOpts.showOuter) dimL(r.addendum, 'OD', 'rgba(167,139,250,0.55)');
+  }
+
+  function drawGrid() {
+    const d = D(), w = canvas.width / d, h = canvas.height / d;
+    const raw = 50 / zoom, mag = Math.pow(10, Math.floor(Math.log10(raw))), norm = raw / mag;
+    let sp; if (norm < 2) sp = mag; else if (norm < 5) sp = 2 * mag; else sp = 5 * mag;
+    const mSp = sp / 5;
+    const [wx0, wy0] = toW(0, 0), [wx1, wy1] = toW(w * d, h * d);
+    const mnX = Math.min(wx0, wx1), mxX = Math.max(wx0, wx1), mnY = Math.min(wy0, wy1), mxY = Math.max(wy0, wy1);
+    if (mSp * zoom > 4) {
+      ctx.strokeStyle = 'rgba(63,63,70,0.3)'; ctx.lineWidth = 0.5 * d; ctx.beginPath();
+      for (let x = Math.floor(mnX / mSp) * mSp; x <= mxX; x += mSp) { const [sx] = toS(x, 0); ctx.moveTo(sx, 0); ctx.lineTo(sx, h * d); }
+      for (let y = Math.floor(mnY / mSp) * mSp; y <= mxY; y += mSp) { const [, sy] = toS(0, y); ctx.moveTo(0, sy); ctx.lineTo(w * d, sy); }
+      ctx.stroke();
+    }
+    ctx.strokeStyle = 'rgba(63,63,70,0.7)'; ctx.lineWidth = 0.8 * d; ctx.beginPath();
+    for (let x = Math.floor(mnX / sp) * sp; x <= mxX; x += sp) { const [sx] = toS(x, 0); ctx.moveTo(sx, 0); ctx.lineTo(sx, h * d); }
+    for (let y = Math.floor(mnY / sp) * sp; y <= mxY; y += sp) { const [, sy] = toS(0, y); ctx.moveTo(0, sy); ctx.lineTo(w * d, sy); }
+    ctx.stroke();
+    const [ox, oy] = toS(0, 0);
+    ctx.strokeStyle = 'rgba(161,161,170,0.3)'; ctx.lineWidth = 1 * d; ctx.beginPath();
+    ctx.moveTo(ox, 0); ctx.lineTo(ox, h * d); ctx.moveTo(0, oy); ctx.lineTo(w * d, oy); ctx.stroke();
+    ctx.fillStyle = 'rgba(161,161,170,0.5)'; ctx.beginPath(); ctx.arc(ox, oy, 3 * d, 0, Math.PI * 2); ctx.fill();
+    if (dOpts.showDims) {
+      ctx.font = `${10 * d}px Inter,sans-serif`; ctx.fillStyle = 'rgba(161,161,170,0.5)';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      for (let x = Math.floor(mnX / sp) * sp; x <= mxX; x += sp) { if (Math.abs(x) < sp * 0.01) continue; const [sx] = toS(x, 0); ctx.fillText(fmtN(x), sx + 3 * d, oy + 4 * d); }
+      ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      for (let y = Math.floor(mnY / sp) * sp; y <= mxY; y += sp) { if (Math.abs(y) < sp * 0.01) continue; const [, sy] = toS(0, y); ctx.fillText(fmtN(y), ox - 4 * d, sy); }
+    }
+  }
+  function fmtN(v) { return Math.abs(v) >= 1 ? Number(v.toFixed(1)).toString() : v.toFixed(2); }
+  function updateInfo() { document.getElementById('canvasInfo').textContent = 'Zoom: ' + (zoom * 100).toFixed(0) + '%'; }
+
+  function zoomToFit() {
+    if (!g1) return;
+    const d = D(), w = canvas.width / d, h = canvas.height / d, pad = 60;
+    if (pairMode && g2) {
+      const maxR = Math.max(g1.radii.addendum, g2.radii.addendum);
+      const totalW = centerDist + 2 * maxR, totalH = 2 * maxR;
+      zoom = Math.min((w - pad) / totalW, (h - pad) / totalH);
+      panX = -centerDist / 2 * zoom;
+      panY = 0;
+    } else {
+      const ra = g1.radii.addendum;
+      zoom = Math.min((w - pad) / (2 * ra), (h - pad) / (2 * ra));
+      panX = 0; panY = 0;
+    }
+    draw();
+  }
+
+  function bindEv() {
+    canvas.addEventListener('wheel', e => {
+      e.preventDefault();
+      const f = e.deltaY > 0 ? 0.9 : 1.1, d = D(), rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      const cx = canvas.width / (2 * d), cy = canvas.height / (2 * d);
+      const wx = (mx - panX - cx) / zoom, wy = -(my - panY - cy) / zoom;
+      zoom *= f; zoom = Math.max(0.01, Math.min(zoom, 500));
+      panX = mx - cx - wx * zoom; panY = my - cy + wy * zoom;
+      draw();
+    }, { passive: false });
+    canvas.addEventListener('mousedown', e => { isDrag = true; lastM = { x: e.clientX, y: e.clientY }; });
+    window.addEventListener('mousemove', e => { if (!isDrag) return; panX += e.clientX - lastM.x; panY += e.clientY - lastM.y; lastM = { x: e.clientX, y: e.clientY }; draw(); });
+    window.addEventListener('mouseup', () => { isDrag = false; });
+    let ltd = null;
+    canvas.addEventListener('touchstart', e => { if (e.touches.length === 1) { isDrag = true; lastM = { x: e.touches[0].clientX, y: e.touches[0].clientY }; } else if (e.touches.length === 2) { isDrag = false; const dx = e.touches[0].clientX - e.touches[1].clientX, dy = e.touches[0].clientY - e.touches[1].clientY; ltd = Math.sqrt(dx * dx + dy * dy); } e.preventDefault(); }, { passive: false });
+    canvas.addEventListener('touchmove', e => { if (e.touches.length === 1 && isDrag) { panX += e.touches[0].clientX - lastM.x; panY += e.touches[0].clientY - lastM.y; lastM = { x: e.touches[0].clientX, y: e.touches[0].clientY }; draw(); } else if (e.touches.length === 2 && ltd !== null) { const dx = e.touches[0].clientX - e.touches[1].clientX, dy = e.touches[0].clientY - e.touches[1].clientY; const dist = Math.sqrt(dx * dx + dy * dy); zoom *= dist / ltd; zoom = Math.max(0.01, Math.min(zoom, 500)); ltd = dist; draw(); } e.preventDefault(); }, { passive: false });
+    canvas.addEventListener('touchend', () => { isDrag = false; ltd = null; });
+    window.addEventListener('resize', resize);
+  }
+
+  return {
+    init, setGear, setGearPair, setDisplayOpt: (k, v) => { dOpts[k] = v; draw(); },
+    zoomToFit, zoomIn() { zoom *= 1.3; draw(); }, zoomOut() { zoom *= 0.77; draw(); },
+    play, pause, stopAnim, setSpeed, isPlaying: () => isPlaying,
+    draw, resize, getCanvas: () => canvas,
+    getState: () => ({ pairMode, g1, g2, centerDist, phase2 })
+  };
+})();
+
+/* ═══════════════════════════════════════════════════════════════
+   APP CONTROLLER
+   ═══════════════════════════════════════════════════════════════ */
+(function() {
+  const $ = s => document.querySelector(s);
+  let result1 = null, result2 = null, params = {}, pairMode = false;
+
+  function toast(m) { const e = $('#toast'); e.textContent = m; e.classList.add('show'); setTimeout(() => e.classList.remove('show'), 2500); }
+  function dl(c, fn, mime) { const b = typeof c === 'string' ? new Blob([c], { type: mime }) : c; const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = fn; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(u); a.remove(); }, 100); }
+  function bindCtl(rId, nId, vId, fmt, cb) {
+    const r = $(rId), n = $(nId), v = $(vId);
+    function sync(src) { const val = parseFloat(src.value); if (isNaN(val)) return; if (src === r) n.value = val; else r.value = Math.max(r.min, Math.min(r.max, val)); v.textContent = fmt(val); (cb || updateGear)(); }
+    r.addEventListener('input', () => sync(r)); n.addEventListener('input', () => sync(n)); n.addEventListener('change', () => sync(n));
+  }
+
+  function readP() {
+    return {
+      module: parseFloat($('#n-mod').value) || 2, teeth: parseInt($('#n-teeth').value) || 24,
+      pressureAngleDeg: parseFloat($('#s-pa').value), profileShift: parseFloat($('#n-ps').value) || 0,
+      bore: parseFloat($('#n-bore').value) || 0, clearance: parseFloat($('#n-cl').value) || 0.25,
+      resolution: parseInt($('#n-res').value) || 40,
+      teeth2: parseInt($('#n-teeth2').value) || 36, profileShift2: parseFloat($('#n-ps2').value) || 0,
+      bore2: parseFloat($('#n-bore2').value) || 0
+    };
+  }
+
+  function updateGear() {
+    params = readP();
+    const { module: m, teeth: z, pressureAngleDeg: pa, profileShift: x, bore, clearance: c, resolution: res } = params;
+
+    // Generate gear 1
+    result1 = GearMath.generate({ module: m, teeth: z, pressureAngleDeg: pa, profileShift: x, clearance: c, resolution: res });
+    const { info: info1, points: pts1 } = result1;
+
+    // Update G1 computed values
+    const mm = v => v.toFixed(3);
+    $('#i-pd').textContent = mm(info1.pitchDia); $('#i-od').textContent = mm(info1.outerDia);
+    $('#i-rd').textContent = mm(info1.rootDia); $('#i-bd').textContent = mm(info1.baseDia);
+    $('#i-cp').textContent = mm(info1.circPitch); $('#i-tt').textContent = mm(info1.toothThk);
+    $('#i-ha').textContent = mm(info1.addendum); $('#i-hf').textContent = mm(info1.dedendum);
+    $('#i-np').textContent = pts1.length;
+    $('#i-uc').textContent = info1.hasUndercut ? 'Yes' : 'No';
+    $('#i-uc').style.color = info1.hasUndercut ? '#ef4444' : '#22c55e';
+
+    // Warnings
+    const rp = m * z / 2, rf = Math.max(rp - m * (1 + c - x), 0.1);
+    const warn = $('#warn-undercut'), wt = $('#warn-text');
+    if (info1.toothThk <= 0) { wt.textContent = 'Tooth thickness is zero or negative.'; warn.className = 'warn warn-red show'; }
+    else if (info1.hasUndercut) { wt.textContent = 'Undercut: min ' + info1.minTeethNoUndercut + ' teeth needed, or increase profile shift.'; warn.className = 'warn warn-orange show'; }
+    else { warn.classList.remove('show'); }
+
+    if (pairMode) {
+      const { teeth2: z2, profileShift2: x2, bore2 } = params;
+      result2 = GearMath.generate({ module: m, teeth: z2, pressureAngleDeg: pa, profileShift: x2, clearance: c, resolution: res });
+      const info2 = result2.info;
+      const cd = m * (z + z2) / 2 + m * (x + x2);
+
+      // Update pair info
+      $('#i-pd2').textContent = mm(info2.pitchDia); $('#i-od2').textContent = mm(info2.outerDia);
+      $('#i-cd').textContent = mm(cd);
+      const g = gcd(z, z2);
+      $('#i-gr').textContent = (z / g) + ':' + (z2 / g);
+      $('#i-sr').textContent = (z2 / z).toFixed(3) + 'x';
+
+      // Transform gear 2 for DXF/SVG export (static mesh position)
+      const phase2 = Math.PI - Math.PI / z2;
+      Renderer.setGearPair(result1, params.bore, result2, params.bore2, cd, z, z2);
+    } else {
+      result2 = null;
+      Renderer.setGear(result1, params.bore);
+    }
+  }
+
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a; }
+
+  function setMode(pair) {
+    pairMode = pair;
+    $('#mode-single').classList.toggle('active', !pair);
+    $('#mode-pair').classList.toggle('active', pair);
+    $('#mode-single').classList.toggle('text-zinc-400', pair);
+    $('#mode-pair').classList.toggle('text-zinc-400', !pair);
+    $('#gear2-section').style.display = pair ? '' : 'none';
+    $('#pair-info').style.display = pair ? '' : 'none';
+    $('#anim-panel').style.display = pair ? '' : 'none';
+    $('#legend-g2').style.display = pair ? '' : 'none';
+    $('#g1-title').textContent = pair ? 'Gear 1' : 'Gear Parameters';
+    if (!pair) { Renderer.stopAnim(); updatePlayBtn(false); }
+    updateGear();
+    requestAnimationFrame(() => Renderer.zoomToFit());
+  }
+
+  function updatePlayBtn(playing) {
+    $('#icon-play').style.display = playing ? 'none' : '';
+    $('#icon-pause').style.display = playing ? '' : 'none';
+  }
+
+  function init() {
+    Renderer.init($('#gearCanvas'));
+
+    // Gear 1 controls
+    bindCtl('#r-mod', '#n-mod', '#v-mod', v => v.toFixed(1));
+    bindCtl('#r-teeth', '#n-teeth', '#v-teeth', v => String(Math.round(v)));
+    bindCtl('#r-ps', '#n-ps', '#v-ps', v => v.toFixed(2));
+    bindCtl('#r-bore', '#n-bore', '#v-bore', v => v.toFixed(1));
+    bindCtl('#r-cl', '#n-cl', '#v-cl', v => v.toFixed(2));
+    bindCtl('#r-res', '#n-res', '#v-res', v => String(Math.round(v)));
+    $('#s-pa').addEventListener('change', updateGear);
+
+    // Gear 2 controls
+    bindCtl('#r-teeth2', '#n-teeth2', '#v-teeth2', v => String(Math.round(v)));
+    bindCtl('#r-ps2', '#n-ps2', '#v-ps2', v => v.toFixed(2));
+    bindCtl('#r-bore2', '#n-bore2', '#v-bore2', v => v.toFixed(1));
+
+    // Mode switch
+    $('#mode-single').addEventListener('click', () => setMode(false));
+    $('#mode-pair').addEventListener('click', () => setMode(true));
+
+    // Animation
+    $('#btn-play').addEventListener('click', () => {
+      if (Renderer.isPlaying()) { Renderer.pause(); updatePlayBtn(false); }
+      else { Renderer.play(); updatePlayBtn(true); }
+    });
+    $('#r-speed').addEventListener('input', e => {
+      const v = parseFloat(e.target.value);
+      Renderer.setSpeed(v);
+      $('#v-speed').textContent = v.toFixed(1) + 'x';
+    });
+
+    // Display toggles
+    document.querySelectorAll('.toggle').forEach(el => {
+      el.addEventListener('click', () => { el.classList.toggle('active'); Renderer.setDisplayOpt(el.dataset.key, el.classList.contains('active')); });
+    });
+
+    // Zoom
+    $('#btn-zoomfit').addEventListener('click', () => Renderer.zoomToFit());
+    $('#btn-zoomin').addEventListener('click', () => Renderer.zoomIn());
+    $('#btn-zoomout').addEventListener('click', () => Renderer.zoomOut());
+
+    // Exports
+    $('#btn-dxf').addEventListener('click', () => {
+      if (!result1) return;
+      toast('Generating DXF...');
+      setTimeout(() => {
+        if (pairMode && result2) {
+          const cd = parseFloat($('#i-cd').textContent);
+          const phase2 = Math.PI - Math.PI / params.teeth2;
+          const g2t = transformPts(result2.points, phase2, cd, 0);
+          const dxf = DXFExport.generate(result1.points, params.bore, result1.radii, g2t, params.bore2, result2.radii, cd);
+          dl(dxf, `gears_z${params.teeth}_z${params.teeth2}_m${params.module}.dxf`, 'application/dxf');
+        } else {
+          const dxf = DXFExport.generate(result1.points, params.bore, result1.radii);
+          dl(dxf, `gear_z${params.teeth}_m${params.module}.dxf`, 'application/dxf');
+        }
+        toast('DXF exported!');
+      }, 30);
+    });
+
+    $('#btn-svg').addEventListener('click', () => {
+      if (!result1) return;
+      toast('Generating SVG...');
+      setTimeout(() => {
+        if (pairMode && result2) {
+          const cd = parseFloat($('#i-cd').textContent);
+          const phase2 = Math.PI - Math.PI / params.teeth2;
+          const g2t = transformPts(result2.points, phase2, cd, 0);
+          const svg = SVGExport.generate(result1.points, params.bore, result1.radii, g2t, params.bore2, result2.radii, cd);
+          dl(svg, `gears_z${params.teeth}_z${params.teeth2}_m${params.module}.svg`, 'image/svg+xml');
+        } else {
+          const svg = SVGExport.generate(result1.points, params.bore, result1.radii);
+          dl(svg, `gear_z${params.teeth}_m${params.module}.svg`, 'image/svg+xml');
+        }
+        toast('SVG exported!');
+      }, 30);
+    });
+
+    $('#btn-png').addEventListener('click', () => {
+      if (!result1) return;
+      toast('Exporting PNG...');
+      setTimeout(() => {
+        Renderer.getCanvas().toBlob(blob => {
+          const name = pairMode ? `gears_z${params.teeth}_z${params.teeth2}_m${params.module}.png` : `gear_z${params.teeth}_m${params.module}.png`;
+          dl(blob, name, 'image/png');
+        });
+      }, 30);
+    });
+
+    // Initial render
+    updateGear();
+    requestAnimationFrame(() => Renderer.zoomToFit());
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+})();
 </script>
 </body>
 </html>
