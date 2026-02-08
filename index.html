@@ -229,6 +229,45 @@
       </div>
     </div>
 
+    <!-- Help / Manual -->
+    <div class="p-5 border-b border-zinc-700">
+      <div class="flex items-center justify-between mb-3.5 cursor-pointer" id="help-toggle">
+        <span class="text-xs font-bold uppercase tracking-widest text-zinc-500 font-mono">Help / Manual</span>
+        <svg id="help-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-zinc-500 transition-transform"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="help-content" style="display:none">
+        <p class="text-xs text-zinc-400 mb-3 leading-relaxed">Geometry calculations follow <strong class="text-zinc-300">DIN 3960</strong> / <strong class="text-zinc-300">ISO 21771</strong> as referenced by <strong class="text-zinc-300">VDI 2736</strong>.</p>
+        <div class="text-xs text-zinc-500 space-y-2 mb-3">
+          <div><span class="text-zinc-400 font-mono">d = m &middot; z</span><br>Pitch diameter</div>
+          <div><span class="text-zinc-400 font-mono">d<sub>b</sub> = d &middot; cos &alpha;</span><br>Base circle diameter</div>
+          <div><span class="text-zinc-400 font-mono">d<sub>a</sub> = d + 2m(1+x)</span><br>Tip diameter (with profile shift x)</div>
+          <div><span class="text-zinc-400 font-mono">d<sub>f</sub> = d &minus; 2m(1+c*&minus;x)</span><br>Root diameter (c* = clearance coeff.)</div>
+          <div><span class="text-zinc-400 font-mono">s = m(&pi;/2 + 2x &middot; tan &alpha;)</span><br>Tooth thickness at pitch circle</div>
+          <div><span class="text-zinc-400 font-mono">a<sub>w</sub> = m(z<sub>1</sub>+z<sub>2</sub>)/2 &middot; cos&alpha;/cos&alpha;<sub>w</sub></span><br>Working center distance (DIN 3960)</div>
+          <div><span class="text-zinc-400 font-mono">z<sub>min</sub> = 2 / sin&sup2;&alpha;</span><br>Min. teeth without undercut</div>
+        </div>
+        <div class="text-xs font-bold uppercase tracking-widest text-zinc-500 font-mono mb-2">References</div>
+        <div class="space-y-1.5">
+          <a href="https://www.vdi.de/richtlinien/details/vdi-2736-blatt-1-thermoplastische-zahnraeder-werkstoffe-werkstoffauswahl-fertigungsverfahren-herstellgenauigkeit-gestalten" target="_blank" rel="noopener" class="flex items-center gap-2 text-xs text-amber-500/80 hover:text-amber-400 transition-colors">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            VDI 2736 Blatt 1 &mdash; Materials &amp; Design
+          </a>
+          <a href="https://www.vdi.de/richtlinien/details/vdi-2736-blatt-2-thermoplastische-zahnraeder-stirnradgetriebe-tragfaehigkeitsberechnung" target="_blank" rel="noopener" class="flex items-center gap-2 text-xs text-amber-500/80 hover:text-amber-400 transition-colors">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            VDI 2736 Blatt 2 &mdash; Load Capacity
+          </a>
+          <a href="https://www.beuth.de/de/norm/din-3960/2845213" target="_blank" rel="noopener" class="flex items-center gap-2 text-xs text-amber-500/80 hover:text-amber-400 transition-colors">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            DIN 3960 &mdash; Involute Gear Geometry
+          </a>
+          <a href="https://www.iso.org/standard/35989.html" target="_blank" rel="noopener" class="flex items-center gap-2 text-xs text-amber-500/80 hover:text-amber-400 transition-colors">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            ISO 21771 &mdash; Cylindrical Involute Gears
+          </a>
+        </div>
+      </div>
+    </div>
+
     <!-- Export -->
     <div class="p-5 mt-auto border-t border-zinc-700">
       <div class="flex items-center justify-between mb-3.5">
@@ -288,7 +327,7 @@ const GearMath = {
     const halfA = toothThk / (2 * rp), invA = inv(alpha);
     const angP = 2 * Math.PI / z, startR = Math.max(rb, rf);
     const minZ = Math.ceil(2 / (Math.sin(alpha) ** 2));
-    const hasUndercut = z < minZ && x < (minZ - z) / (2 * minZ);
+    const hasUndercut = z < minZ && x < (minZ - z) / minZ;
 
     const rAng = (tc, r) => r <= rb ? tc + halfA + invA : tc + halfA + invA - inv(Math.acos(Math.min(rb / r, 1)));
     const lAng = (tc, r) => r <= rb ? tc - halfA - invA : tc - halfA - invA + inv(Math.acos(Math.min(rb / r, 1)));
@@ -688,7 +727,15 @@ const Renderer = (() => {
       const { teeth2: z2, profileShift2: x2, bore2 } = params;
       result2 = GearMath.generate({ module: m, teeth: z2, pressureAngleDeg: pa, profileShift: x2, clearance: c, resolution: res });
       const info2 = result2.info;
-      const cd = m * (z + z2) / 2 + m * (x + x2);
+      const inv = a => Math.tan(a) - a;
+      const alpha = pa * Math.PI / 180;
+      const alphaW = (() => {
+        const target = inv(alpha) + 2 * Math.tan(alpha) * (x + x2) / (z + z2);
+        let lo = 0.001, hi = Math.PI / 2 - 0.001;
+        for (let i = 0; i < 60; i++) { const mid = (lo + hi) / 2; if (inv(mid) < target) lo = mid; else hi = mid; }
+        return (lo + hi) / 2;
+      })();
+      const cd = m * (z + z2) / 2 * Math.cos(alpha) / Math.cos(alphaW);
 
       // Update pair info
       $('#i-pd2').textContent = mm(info2.pitchDia); $('#i-od2').textContent = mm(info2.outerDia);
@@ -759,6 +806,14 @@ const Renderer = (() => {
       const v = parseFloat(e.target.value);
       Renderer.setSpeed(v);
       $('#v-speed').textContent = v.toFixed(1) + 'x';
+    });
+
+    // Help toggle
+    $('#help-toggle').addEventListener('click', () => {
+      const c = $('#help-content'), ch = $('#help-chevron');
+      const open = c.style.display === 'none';
+      c.style.display = open ? '' : 'none';
+      ch.style.transform = open ? 'rotate(180deg)' : '';
     });
 
     // Display toggles
