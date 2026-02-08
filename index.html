@@ -334,10 +334,17 @@ const DXFExport = {
     w('9');w('$INSUNITS');w('70');w('4');
     w('9');w('$MEASUREMENT');w('70');w('1');
     w('0');w('ENDSEC');
+    // Linetype table
+    w('0');w('SECTION');w('2');w('TABLES');
+    w('0');w('TABLE');w('2');w('LTYPE');w('70');w('2');
+    w('0');w('LTYPE');w('2');w('CONTINUOUS');w('70');w('0');w('3');w('Solid line');w('72');w('65');w('73');w('0');w('40');w('0.0');
+    w('0');w('LTYPE');w('2');w('CENTER');w('70');w('0');w('3');w('Center ____ _ ____ _');w('72');w('65');w('73');w('4');w('40');w('2.0');w('49');w('1.25');w('49');w('-0.25');w('49');w('0.25');w('49');w('-0.25');
+    w('0');w('ENDTAB');
     // Layer table
-    w('0');w('SECTION');w('2');w('TABLES');w('0');w('TABLE');w('2');w('LAYER');w('70');w('4');
-    const addLayer = (name, color) => { w('0');w('LAYER');w('2');w(name);w('70');w('0');w('62');w(String(color));w('6');w('CONTINUOUS'); };
-    addLayer('GEAR_1', 7); addLayer('GEAR_2', 4); addLayer('BORE', 1); addLayer('CENTER_LINE', 2);
+    w('0');w('TABLE');w('2');w('LAYER');w('70');w('6');
+    const addLayer = (name, color, ltype) => { w('0');w('LAYER');w('2');w(name);w('70');w('0');w('62');w(String(color));w('6');w(ltype || 'CONTINUOUS'); };
+    addLayer('GEAR_1', 7); addLayer('GEAR_2', 4); addLayer('BORE', 1); addLayer('CENTER_LINE', 2, 'CENTER');
+    addLayer('PITCH_CIRCLE', 3, 'CENTER'); addLayer('BASE_CIRCLE', 5, 'CENTER');
     w('0');w('ENDTAB');w('0');w('ENDSEC');
     // Entities
     w('0');w('SECTION');w('2');w('ENTITIES');
@@ -349,9 +356,13 @@ const DXFExport = {
     const writeCircle = (cx, cy, r, layer) => { w('0');w('CIRCLE');w('8');w(layer);w('10');w(cx.toFixed(6));w('20');w(cy.toFixed(6));w('40');w(r.toFixed(6)); };
     writePoly(gear1pts, 'GEAR_1');
     if (bore1 > 0) writeCircle(0, 0, bore1 / 2, 'BORE');
+    writeCircle(0, 0, radii1.pitch, 'PITCH_CIRCLE');
+    writeCircle(0, 0, radii1.base, 'BASE_CIRCLE');
     if (gear2pts) {
       writePoly(gear2pts, 'GEAR_2');
       if (bore2 > 0) writeCircle(cd, 0, bore2 / 2, 'BORE');
+      writeCircle(cd, 0, radii2.pitch, 'PITCH_CIRCLE');
+      writeCircle(cd, 0, radii2.base, 'BASE_CIRCLE');
       w('0');w('LINE');w('8');w('CENTER_LINE');w('10');w('0.000000');w('20');w('0.000000');w('11');w(cd.toFixed(6));w('21');w('0.000000');
     }
     w('0');w('ENDSEC');w('0');w('EOF');
