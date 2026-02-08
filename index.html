@@ -334,10 +334,17 @@ const DXFExport = {
     w('9');w('$INSUNITS');w('70');w('4');
     w('9');w('$MEASUREMENT');w('70');w('1');
     w('0');w('ENDSEC');
+    // Linetype table
+    w('0');w('SECTION');w('2');w('TABLES');
+    w('0');w('TABLE');w('2');w('LTYPE');w('70');w('2');
+    w('0');w('LTYPE');w('2');w('CONTINUOUS');w('70');w('0');w('3');w('Solid line');w('72');w('65');w('73');w('0');w('40');w('0.0');
+    w('0');w('LTYPE');w('2');w('CENTER');w('70');w('0');w('3');w('Center ____ _ ____ _');w('72');w('65');w('73');w('4');w('40');w('2.0');w('49');w('1.25');w('49');w('-0.25');w('49');w('0.25');w('49');w('-0.25');
+    w('0');w('ENDTAB');
     // Layer table
-    w('0');w('SECTION');w('2');w('TABLES');w('0');w('TABLE');w('2');w('LAYER');w('70');w('6');
-    const addLayer = (name, color) => { w('0');w('LAYER');w('2');w(name);w('70');w('0');w('62');w(String(color));w('6');w('CONTINUOUS'); };
-    addLayer('GEAR_1', 7); addLayer('GEAR_2', 4); addLayer('BORE', 1); addLayer('PITCH_CIRCLE', 3); addLayer('BASE_CIRCLE', 5); addLayer('CENTER_LINE', 2);
+    w('0');w('TABLE');w('2');w('LAYER');w('70');w('6');
+    const addLayer = (name, color, ltype) => { w('0');w('LAYER');w('2');w(name);w('70');w('0');w('62');w(String(color));w('6');w(ltype || 'CONTINUOUS'); };
+    addLayer('GEAR_1', 7); addLayer('GEAR_2', 4); addLayer('BORE', 1); addLayer('CENTER_LINE', 2, 'CENTER');
+    addLayer('PITCH_CIRCLE', 3, 'CENTER'); addLayer('BASE_CIRCLE', 5, 'CENTER');
     w('0');w('ENDTAB');w('0');w('ENDSEC');
     // Entities
     w('0');w('SECTION');w('2');w('ENTITIES');
