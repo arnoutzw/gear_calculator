@@ -835,49 +835,41 @@ const Renderer = (() => {
     // Exports
     $('#btn-dxf').addEventListener('click', () => {
       if (!result1) return;
-      toast('Generating DXF...');
-      setTimeout(() => {
-        if (pairMode && result2) {
-          const cd = parseFloat($('#i-cd').textContent);
-          const phase2 = Math.PI - Math.PI / params.teeth2;
-          const g2t = transformPts(result2.points, phase2, cd, 0);
-          const dxf = DXFExport.generate(result1.points, params.bore, result1.radii, g2t, params.bore2, result2.radii, cd);
-          dl(dxf, `gears_z${params.teeth}_z${params.teeth2}_m${params.module}.dxf`, 'application/dxf');
-        } else {
-          const dxf = DXFExport.generate(result1.points, params.bore, result1.radii);
-          dl(dxf, `gear_z${params.teeth}_m${params.module}.dxf`, 'application/dxf');
-        }
-        toast('DXF exported!');
-      }, 30);
+      if (pairMode && result2) {
+        const cd = parseFloat($('#i-cd').textContent);
+        const phase2 = Math.PI - Math.PI / params.teeth2;
+        const g2t = transformPts(result2.points, phase2, cd, 0);
+        const dxf = DXFExport.generate(result1.points, params.bore, result1.radii, g2t, params.bore2, result2.radii, cd);
+        dl(dxf, `gears_z${params.teeth}_z${params.teeth2}_m${params.module}.dxf`, 'application/dxf');
+      } else {
+        const dxf = DXFExport.generate(result1.points, params.bore, result1.radii);
+        dl(dxf, `gear_z${params.teeth}_m${params.module}.dxf`, 'application/dxf');
+      }
+      toast('DXF exported!');
     });
 
     $('#btn-svg').addEventListener('click', () => {
       if (!result1) return;
-      toast('Generating SVG...');
-      setTimeout(() => {
-        if (pairMode && result2) {
-          const cd = parseFloat($('#i-cd').textContent);
-          const phase2 = Math.PI - Math.PI / params.teeth2;
-          const g2t = transformPts(result2.points, phase2, cd, 0);
-          const svg = SVGExport.generate(result1.points, params.bore, result1.radii, g2t, params.bore2, result2.radii, cd);
-          dl(svg, `gears_z${params.teeth}_z${params.teeth2}_m${params.module}.svg`, 'image/svg+xml');
-        } else {
-          const svg = SVGExport.generate(result1.points, params.bore, result1.radii);
-          dl(svg, `gear_z${params.teeth}_m${params.module}.svg`, 'image/svg+xml');
-        }
-        toast('SVG exported!');
-      }, 30);
+      if (pairMode && result2) {
+        const cd = parseFloat($('#i-cd').textContent);
+        const phase2 = Math.PI - Math.PI / params.teeth2;
+        const g2t = transformPts(result2.points, phase2, cd, 0);
+        const svg = SVGExport.generate(result1.points, params.bore, result1.radii, g2t, params.bore2, result2.radii, cd);
+        dl(svg, `gears_z${params.teeth}_z${params.teeth2}_m${params.module}.svg`, 'image/svg+xml');
+      } else {
+        const svg = SVGExport.generate(result1.points, params.bore, result1.radii);
+        dl(svg, `gear_z${params.teeth}_m${params.module}.svg`, 'image/svg+xml');
+      }
+      toast('SVG exported!');
     });
 
     $('#btn-png').addEventListener('click', () => {
       if (!result1) return;
-      toast('Exporting PNG...');
-      setTimeout(() => {
-        Renderer.getCanvas().toBlob(blob => {
-          const name = pairMode ? `gears_z${params.teeth}_z${params.teeth2}_m${params.module}.png` : `gear_z${params.teeth}_m${params.module}.png`;
-          dl(blob, name, 'image/png');
-        });
-      }, 30);
+      Renderer.getCanvas().toBlob(blob => {
+        const name = pairMode ? `gears_z${params.teeth}_z${params.teeth2}_m${params.module}.png` : `gear_z${params.teeth}_m${params.module}.png`;
+        dl(blob, name, 'image/png');
+        toast('PNG exported!');
+      });
     });
 
     // Initial render
