@@ -684,7 +684,7 @@ const Renderer = (() => {
   let result1 = null, result2 = null, params = {}, pairMode = false;
 
   function toast(m) { const e = $('#toast'); e.textContent = m; e.classList.add('show'); setTimeout(() => e.classList.remove('show'), 2500); }
-  function dl(c, fn, mime) { const b = typeof c === 'string' ? new Blob([c], { type: mime }) : c; const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = fn; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(u); a.remove(); }, 100); }
+  function dl(c, fn, mime) { const b = typeof c === 'string' ? new Blob([c], { type: mime || 'application/octet-stream' }) : c; const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = fn; a.style.display = 'none'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 5000); }
   function bindCtl(rId, nId, vId, fmt, cb) {
     const r = $(rId), n = $(nId), v = $(vId);
     function sync(src) { const val = parseFloat(src.value); if (isNaN(val)) return; if (src === r) n.value = val; else r.value = Math.max(r.min, Math.min(r.max, val)); v.textContent = fmt(val); (cb || updateGear)(); }
