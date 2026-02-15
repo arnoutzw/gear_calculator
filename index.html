@@ -396,6 +396,8 @@ const DXFExport = {
     const writePoly = (pts, layer) => {
       w('0');w('POLYLINE');w('8');w(layer);w('66');w('1');w('70');w('1');
       for (const [x, y] of pts) { w('0');w('VERTEX');w('8');w(layer);w('10');w(x.toFixed(6));w('20');w(y.toFixed(6)); }
+      // Explicitly close: repeat first vertex so all DXF readers see a closed profile
+      if (pts.length > 2) { const [fx, fy] = pts[0]; w('0');w('VERTEX');w('8');w(layer);w('10');w(fx.toFixed(6));w('20');w(fy.toFixed(6)); }
       w('0');w('SEQEND');w('8');w(layer);
     };
     const writeCircle = (cx, cy, r, layer) => { w('0');w('CIRCLE');w('8');w(layer);w('10');w(cx.toFixed(6));w('20');w(cy.toFixed(6));w('40');w(r.toFixed(6)); };
